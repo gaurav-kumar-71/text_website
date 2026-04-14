@@ -73,13 +73,11 @@ button {
 
 <div class="container">
 
-    <!-- QUESTION -->
     <div class="left">
         <h3>Question</h3>
         <p>Write a C++ program to check if a number is prime.</p>
     </div>
 
-    <!-- CODE EDITOR -->
     <div class="right">
         <h3>Code Editor (C++)</h3>
         <textarea id="editor" class="editor" spellcheck="false"></textarea>
@@ -109,28 +107,60 @@ const timer = setInterval(() => {
 // ================= SECURITY SYSTEM =================
 const editor = document.getElementById("editor");
 
-// Track internal copy
 let internalClipboard = "";
 
-// Allow copy ONLY from editor
+// ✅ FIXED COPY
 editor.addEventListener("copy", function(e) {
-    internalClipboard = window.getSelection().toString();
+    const selectedText = editor.value.substring(
+        editor.selectionStart,
+        editor.selectionEnd
+    );
+
+    internalClipboard = selectedText;
+
+    e.clipboardData.setData("text/plain", selectedText);
+    e.preventDefault();
 });
 
-// Allow cut ONLY from editor
+// ✅ FIXED CUT
 editor.addEventListener("cut", function(e) {
-    internalClipboard = window.getSelection().toString();
+    const selectedText = editor.value.substring(
+        editor.selectionStart,
+        editor.selectionEnd
+    );
+
+    internalClipboard = selectedText;
+
+    e.clipboardData.setData("text/plain", selectedText);
+
+    editor.value =
+        editor.value.substring(0, editor.selectionStart) +
+        editor.value.substring(editor.selectionEnd);
+
+    e.preventDefault();
 });
 
-// Custom paste logic
+// ✅ FIXED MULTI-LINE PASTE
 editor.addEventListener("paste", function(e) {
     const pasted = (e.clipboardData || window.clipboardData).getData("text");
 
-    // Allow paste ONLY if it matches internal clipboard
     if (pasted !== internalClipboard) {
         e.preventDefault();
         alert("External paste blocked!");
+        return;
     }
+
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+
+    editor.value =
+        editor.value.substring(0, start) +
+        pasted +
+        editor.value.substring(end);
+
+    editor.selectionStart = editor.selectionEnd = start + pasted.length;
+
+    e.preventDefault();
 });
 
 
@@ -181,7 +211,7 @@ document.addEventListener("visibilitychange", function() {
 });
 
 
-// ================= FULLSCREEN ENFORCEMENT =================
+// ================= FULLSCREEN =================
 function enterFullscreen() {
     document.documentElement.requestFullscreen();
 }
