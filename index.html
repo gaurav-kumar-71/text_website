@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clipboard Control Practice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .badge-blue  { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-red   { background: #fee2e2; color: #991b1b; }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: bold;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: monospace;
+      font-size: 13px;
+      resize: vertical;
+      background: #f9f9f9;
+      color: #333;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #888;
+    }
+
+    .log {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .log-neutral { background: #f1f5f9; color: #555; }
+    .log-success { background: #dcfce7; color: #166534; }
+    .log-error   { background: #fee2e2; color: #991b1b; }
+    .log-info    { background: #dbeafe; color: #1e40af; }
+
+    .hint {
+      font-size: 12px;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    .code-box {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 16px;
+    }
+
+    .code-box p {
+      font-size: 12px;
+      font-weight: bold;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .code-box pre {
+      font-family: monospace;
+      font-size: 13px;
+      color: #334155;
+      white-space: pre-wrap;
+    }
+
+    .green { color: #16a34a; }
+    .blue  { color: #1d4ed8; }
+    .red   { color: #b91c1c; }
+  </style>
+</head>
+<body>
+
+  <h1>Clipboard Control Practice</h1>
+  <p class="subtitle">Copy from Step 1 → Paste in Step 2. Copying from Step 3 will be blocked!</p>
+
+  <!-- STEP 1: Source Box -->
+  <div class="card">
+    <div class="card-header">
+      <div class="badge badge-blue">1</div>
+      <div class="card-title">Copy from here (safe zone)</div>
+    </div>
+    <div class="label">Code editor — select and copy this code</div>
+    <textarea id="sourceBox" rows="5" readonly>#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    cout &lt;&lt; "Hello World!" &lt;&lt; endl;
+    return 0;
+}</textarea>
+    <div class="log log-neutral" id="copyLog">
+      &#9679; Select any text above and press Ctrl+C to copy
+    </div>
+  </div>
+
+  <!-- STEP 2: Target Box -->
+  <div class="card">
+    <div class="card-header">
+      <div class="badge badge-green">2</div>
+      <div class="card-title">Paste here (only from Step 1 works)</div>
+    </div>
+    <div class="label">Answer box — try pasting here</div>
+    <textarea id="targetBox" rows="5" placeholder="Try pasting here..."></textarea>
+    <div class="log log-neutral" id="pasteLog">
+      &#9679; Paste something here to see what happens
+    </div>
+  </div>
+
+  <!-- STEP 3: Outside Box -->
+  <div class="card">
+    <div class="card-header">
+      <div class="badge badge-red">3</div>
+      <div class="card-title">Copy from here — it will be blocked in Step 2</div>
+    </div>
+    <div class="label">External text — copy this, then try pasting in Step 2</div>
+    <textarea id="outsideBox" rows="2" readonly>This text is from OUTSIDE. Copy me and try pasting in Step 2!</textarea>
+    <p class="hint">Copy from here → go to Step 2 → press Ctrl+V → watch it get blocked!</p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="code-box">
+    <p>What the JavaScript is doing</p>
+    <pre>
+<span class="green">// Step 1: When you copy from sourceBox → save it</span>
+<span class="blue">sourceBox</span>.addEventListener(<span class="red">'copy'</span>, function() {
+    allowedText = selected text from sourceBox
+})
+
+<span class="green">// Step 2: When you paste into targetBox → check it</span>
+<span class="blue">targetBox</span>.addEventListener(<span class="red">'paste'</span>, function(e) {
+    if (pastedText !== allowedText) {
+        e.preventDefault()  <span class="green">// BLOCK the paste</span>
+    }
+})
+    </pre>
+  </div>
+
+  <script>
+
+    // This variable stores the text copied from OUR editor (Step 1)
+    let allowedText = null;
+
+    // Get references to all the boxes and log elements
+    const sourceBox  = document.getElementById('sourceBox');
+    const targetBox  = document.getElementById('targetBox');
+    const outsideBox = document.getElementById('outsideBox');
+    const copyLog    = document.getElementById('copyLog');
+    const pasteLog   = document.getElementById('pasteLog');
+
+    // ---- Helper function to update log messages ----
+    function setLog(element, type, message) {
+      // Remove all existing classes first
+      element.className = 'log';
+
+      // Add the right color class based on type
+      if (type === 'success') element.classList.add('log-success');
+      if (type === 'error')   element.classList.add('log-error');
+      if (type === 'info')    element.classList.add('log-info');
+      if (type === 'neutral') element.classList.add('log-neutral');
+
+      // Set the message text
+      element.innerHTML = '&#9679; ' + message;
+    }
+
+    // ---- EVENT 1: Copying from the SOURCE box (Step 1) ----
+    sourceBox.addEventListener('copy', function() {
+
+      // Get what the user selected inside the textarea
+      const start = sourceBox.selectionStart;
+      const end   = sourceBox.selectionEnd;
+      const selected = sourceBox.value.substring(start, end);
+
+      if (selected.length > 0) {
+        allowedText = selected; // save it as the "allowed" text
+        setLog(copyLog, 'success', 'Copied from editor! You can now paste this in Step 2.');
+      }
+
+    });
+
+    // ---- EVENT 2: Copying from the OUTSIDE box (Step 3) ----
+    outsideBox.addEventListener('copy', function() {
+      // We do NOT update allowedText here
+      // So when they try to paste it, it won't match
+      setLog(copyLog, 'info', 'Copied from outside! Try pasting in Step 2 — it will be blocked.');
+    });
+
+    // ---- EVENT 3: Pasting into the TARGET box (Step 2) ----
+    targetBox.addEventListener('paste', function(e) {
+
+      // Read what the user is trying to paste
+      const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+
+      // Check: does it match what was copied from our editor?
+      if (pastedText === allowedText && allowedText !== null) {
+        // YES — allow it
+        setLog(pasteLog, 'success', 'Paste allowed! This text came from the editor.');
+
+      } else {
+        // NO — block it
+        e.preventDefault(); // this line STOPS the paste from happening
+        setLog(pasteLog, 'error', 'Paste blocked! Only text copied from Step 1 is allowed.');
+      }
+
+    });
+
+    // ---- Bonus: Reset the log if user clears the target box ----
+    targetBox.addEventListener('input', function() {
+      if (targetBox.value === '') {
+        setLog(pasteLog, 'neutral', 'Paste something here to see what happens');
+      }
+    });
+
+  </script>
+
+</body>
+</html>
